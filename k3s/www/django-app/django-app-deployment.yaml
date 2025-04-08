@@ -7,6 +7,11 @@ metadata:
 spec:
   replicas: 1
   revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: django-app
@@ -14,6 +19,8 @@ spec:
     metadata:
       labels:
         app: django-app
+      annotations:
+        rollout-timestamp: "{{ GITHUB_SHA }}"  # This will be replaced in your GitHub Action
     spec:
       containers:
         - name: django-app-container

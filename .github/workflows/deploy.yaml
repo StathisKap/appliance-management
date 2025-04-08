@@ -40,20 +40,8 @@ jobs:
         run: |
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
 
-      - name: Conditional Rollout Restart
+      - name: Deploy to K3s
         run: |
-          #!/bin/bash
-
           export KUBECONFIG=kubeconfig.yaml
-          NAMESPACE="django-app"
-          DEPLOYMENT_NAME="django-app"
-
-          DEPLOYMENT_EXISTS=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE --ignore-not-found -o jsonpath='{.metadata.name}')
-
-          if [ -n "$DEPLOYMENT_EXISTS" ]; then
-            kubectl rollout restart deployment/$DEPLOYMENT_NAME -n $NAMESPACE
-            echo "Deployment $DEPLOYMENT_NAME restarted."
-          else
-            kubectl apply -f k3s/www/$DEPLOYMENT_NAME/$DEPLOYMENT_NAME-deployment.yaml -n $NAMESPACE
-            echo "Deployment $DEPLOYMENT_NAME not found, applying it now."
-          fi
+          sed -i "s/{{ GITHUB_SHA }}/$GITHUB_SHA/g" k3s/www/django-app/django-app-deployment.yaml
+          kubectl apply -f k3s/www/django-app/django-app-deployment.yaml
