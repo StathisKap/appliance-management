@@ -19,6 +19,15 @@ spec:
         - name: django-app-container
           image: stathiskap/appliance-management:1.0
           imagePullPolicy: Always
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 100
           env:
             - name: DATABASE_URL
               value: "postgres://postgres:gZRiEt9FuCLgo85@my-postgres-postgresql.postgres.svc.cluster.local:5432/postgres"
