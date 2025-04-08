@@ -41,7 +41,7 @@ spec:
             - name: DEBUG
               value: "False"
             - name: ALLOWED_HOSTS
-              value: '["appliance-management.co.uk"]'
+              value: '["appliance-management.co.uk", "django-app-service", "django-app-service.django-app", "django-app-service.django-app.svc.cluster.local"]'
             - name: S3_ENDPOINT_URL
               value: "https://cdn.appliance-management.co.uk"
             - name: S3_ACCESS_KEY
