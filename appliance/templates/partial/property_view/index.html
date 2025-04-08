@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+  <div class="container-fluid p-0">
+    <!-- Property Info Card -->
+    <div class="card rounded-4 shadow-sm mb-4">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center">
+          <h2 class="text-primary mb-0">{{ user_property.property.name }}</h2>
+          <span class="text-muted ms-3">{{ user_property.property.address }}</span>
+          <span class="text-muted ms-3">Assigned: {{ user_property.assignment_date }}</span>
+        </div>
+      </div>
+    </div>
+    <!-- Schedules Card -->
+    {% include "partial/property_view/schedules_card.html" %}
+    <!-- Appliances Card -->
+    {% include "partial/property_view/appliances_card.html" %}
+  </div>
+  {% include "partial/property_view/appliance_add_modal.html" %}
+
+<script>
+  let applianceModal = null;
+
+  document.addEventListener('showAddApplianceModal', function() {
+    if (!applianceModal) {
+      applianceModal = new bootstrap.Modal(document.getElementById('applianceAddModal'));
+    }
+    applianceModal.show();
+  });
+
+  document.addEventListener('refreshApplianceList', function() {
+    if (applianceModal) {
+      applianceModal.hide();
+    }
+  });
+</script>
+{% endblock content %}

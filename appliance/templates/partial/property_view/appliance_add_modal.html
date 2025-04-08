@@ -1,0 +1,66 @@
+{% load static %}
+{% load appliance_filters %}
+<div class="modal fade" id="applianceAddModal" tabindex="-1" aria-labelledby="applianceAddModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="applianceAddModalLabel">Add New Appliance</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-primary align-middle">
+              <tr>
+                <th scope="col" class="py-3 px-3 fw-medium my-8">Type</th>
+                <th scope="col" class="py-3 px-3 fw-medium my-8">Brand</th>
+                <th scope="col" class="py-3 px-3 fw-medium my-8">Model</th>
+                <th scope="col" class="py-3 px-3 fw-medium my-8">Cost</th>
+                <th scope="col" class="py-3 px-3 fw-medium my-8">Efficiency Rating</th>
+                <th scope="col" class="py-3 px-3 fw-medium my-8">Image</th>
+                <th scope="col" class="py-3 px-3 fw-medium my-8"></th>
+              </tr>
+            </thead>
+            <tbody class="table-border-style-hidden">
+              {% if appliances %}
+                {% for appliance in appliances %}
+                  <tr class="border-bottom">
+                    <td class="py-3 px-3 text-muted">{{ appliance.appliance_type|format_snake_case }}</td>
+                    <td class="py-3 px-3 text-muted">{{ appliance.brand }}</td>
+                    <td class="py-3 px-3 text-muted">{{ appliance.model }}</td>
+                    <td class="py-3 px-3 text-muted">${{ appliance.cost }}</td>
+                    <td class="py-3 px-3 text-muted">{{ appliance.efficiency_rating|format_snake_case }}</td>
+                    <td class="py-3 px-3">
+                      <img src="{{ appliance.image.url }}"
+                           alt="{{ appliance }}"
+                           width=""
+                           height="50">
+                    </td>
+                    <td class="py-3 px-3">
+                      <button class="btn btn-primary px-4"
+                              id="add-appliance-{{ appliance.id }}"
+                              hx-post="{% url 'add_property_appliance_submit' %}"
+                              hx-vals='{"appliance": "{{ appliance.id }}",
+                                      "property": "{{ user_property.property.id }}",
+                                      "actual_cost": "{{ appliance.cost }}",
+                                      "actual_warranty_period": "{{ appliance.warranty_period }}",
+                                      "usage": "low"}'
+                                      hx-target="#appliance-list"
+                                      hx-swap="afterbegin">
+                        Select
+                      </button>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="7" class="py-3 px-3 text-center">No appliances found</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

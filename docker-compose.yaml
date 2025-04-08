@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://postgres:gZRiEt9FuCLgo85@tcp.appliance-management.co.uk:5432/postgres
+      - DEBUG=False
+      - ALLOWED_HOSTS=["localhost"]
+      - ENDPOINT_URL=https://cdn.appliance-management.co.uk
+      - ACCESS_KEY=wO9gEaLKvtI0Nx69EYpN
+      - SECRET_KEY=8mmFyFNQIvzF1dXOSgBXAxqj9JOA7JktJEqQBLOv
+      - BUCKET_NAME=app-manager
+      - SUPERUSER_NAME=admin
+      - SUPERUSER_PASSWORD=test

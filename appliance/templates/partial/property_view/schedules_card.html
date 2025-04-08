@@ -1,0 +1,61 @@
+<div class="card rounded-4 shadow-sm mb-4">
+  <div class="card-body p-4">
+    <h2 class="mb-4 text-primary">Scheduled Replacements</h2>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th scope="col" class="py-3 px-3 fw-medium">Appliance</th>
+            <th scope="col" class="py-3 px-3 fw-medium">Replacement</th>
+            <th scope="col" class="py-3 px-3 fw-medium">Date & Time</th>
+            <th scope="col" class="py-3 px-3 fw-medium">Tenant Contact</th>
+            <th scope="col" class="py-3 px-3 fw-medium">Notifications</th>
+            <th scope="col" class="py-3 px-3 fw-medium"></th>
+          </tr>
+        </thead>
+        <tbody class="table-border-style-hidden">
+          {% for property_appliance in user_property.property.property_appliances.all %}
+            {% for schedule in property_appliance.schedules.all %}
+              <tr class="border-bottom" id="schedule-{{ schedule.id }}">
+                <td class="py-3 px-3 text-muted">{{ schedule.property_appliance.appliance }}</td>
+                <td class="py-3 px-3 text-muted">{{ schedule.replacement_appliance }}</td>
+                <td class="py-3 px-3 text-muted">
+                  {{ schedule.date }} at {{ schedule.hour|stringformat:"02d" }}:{{ schedule.minute|stringformat:"02d" }}
+                </td>
+                <td class="py-3 px-3 text-muted">
+                  {% if schedule.tenant_email %}
+                    {{ schedule.tenant_email }}
+                    {% if schedule.tenant_phone %}
+                      <br>
+                      {{ schedule.tenant_phone }}
+                    {% endif %}
+                  {% else %}
+                    No contact info
+                  {% endif %}
+                </td>
+                <td class="py-3 px-3 text-muted">
+                  {% if schedule.notifications_enabled %}
+                    <span class="text-success">Enabled</span>
+                  {% else %}
+                    <span class="text-muted">Disabled</span>
+                  {% endif %}
+                </td>
+                <td class="py-3 px-3 text-muted">
+                  <button class="btn btn-danger"
+                          hx-post="{% url 'delete_schedule' schedule.id %}"
+                          hx-target="#schedule-{{ schedule.id }}"
+                          hx-swap="delete">Cancel</button>
+                </td>
+              </tr>
+            {% endfor %}
+          {% endfor %}
+          {% if not property_appliance.schedules.all and not user_property.property.property_appliances.all %}
+            <tr>
+              <td colspan="5" class="py-3 px-3 text-center">No scheduled replacements found.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

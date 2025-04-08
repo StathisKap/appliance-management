@@ -1,0 +1,65 @@
+<div class="notification-container position-relative d-flex align-items-center justify-content-center border border-primary rounded-3 me-3"
+     data-bs-toggle="popover"
+     data-bs-placement="bottom"
+     data-bs-trigger="click"
+     data-bs-html="true"
+     data-bs-content="
+       <div class=&quot;p-2&quot;>
+         <h6 class=&quot;mb-2&quot;>Notifications</h6>
+         <div class=&quot;notification-item&quot; data-notification-id=&quot;1&quot;>
+           <p class=&quot;mb-0 small&quot;>New appliance added to Property #123</p>
+         </div>
+       </div>
+     ">
+  <i class="bi bi-bell text-primary fs-4 thick-icon"></i>
+  <i class="bi bi-circle-fill text-danger position-absolute notification-dot"></i>
+</div>
+
+<style>
+  .thick-icon {
+    -webkit-text-stroke: 0.7px var(--bs-primary);
+    font-weight: bold;
+  }
+  .notification-dot {
+    top: 8px;
+    right: 8px;
+    font-size: 8px;
+  }
+  .notification-item:hover {
+    background-color: var(--bs-light);
+  }
+
+  .notification-container {
+    width: 40px;
+    height: 40px;
+  }
+
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const notificationContainer = document.querySelector('.notification-container');
+    const notificationDot = document.querySelector('.notification-dot');
+    const bellIcon = document.querySelector('.bi-bell');
+    const popover = new bootstrap.Popover(notificationContainer, {
+      container: 'body',
+      customClass: 'notification-popover'
+    });
+
+    // Handle bell icon click
+    notificationContainer.addEventListener('click', function() {
+      notificationDot.style.display = 'none';
+    });
+
+    // Handle popover show/hide
+    notificationContainer.addEventListener('shown.bs.popover', function() {
+      bellIcon.classList.remove('bi-bell');
+      bellIcon.classList.add('bi-bell-fill');
+    });
+
+    notificationContainer.addEventListener('hidden.bs.popover', function() {
+      bellIcon.classList.remove('bi-bell-fill');
+      bellIcon.classList.add('bi-bell');
+    });
+  });
+</script>

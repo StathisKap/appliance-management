@@ -1,0 +1,19 @@
+{% if request.resolver_match.url_name == 'property_view' %}
+  <div class="d-flex align-items-center lh-1 small mb-2">
+    <a href="{% url 'home' %}" class="text-decoration-none">
+      <i class="bi bi-chevron-left text-primary me-2"></i>
+    </a>
+    <span class="text-primary">Appliances</span>
+  </div>
+{% elif request.resolver_match.url_name == 'property_appliance_view' %}
+  <div class="d-flex align-items-center lh-1 small mb-2">
+    <a href="{% url 'property_view' request.resolver_match.kwargs.property_id %}" class="text-decoration-none">
+      <i class="bi bi-chevron-left text-primary me-2"></i>
+    </a>
+    <a href="{% url 'property_view' request.resolver_match.kwargs.property_id %}" class="text-decoration-none">
+      <span class="text-primary">Appliances</span>
+    </a>
+    <i class="bi bi-dot fs-2 lh-1 text-primary"></i>
+    <span class="text-muted lh-1">Replace</span>
+  </div>
+{% endif %}

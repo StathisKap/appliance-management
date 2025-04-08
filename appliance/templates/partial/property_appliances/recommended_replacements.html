@@ -1,0 +1,57 @@
+{% load static %}
+{% load appliance_filters %}
+{% csrf_token %}
+<div class="container-fluid p-0">
+  <div class="card rounded-4 shadow-sm">
+    <div class="card-body p-4">
+      <h2 class="mb-4 text-primary">Iterum IQ recommended replacement</h2>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-primary">
+            <tr>
+              <th scope="col" class="py-3 px-3 fw-medium">Type</th>
+              <th scope="col" class="py-3 px-3 fw-medium">Brand</th>
+              <th scope="col" class="py-3 px-3 fw-medium">Model</th>
+              <th scope="col" class="py-3 px-3 fw-medium">Cost</th>
+              <th scope="col" class="py-3 px-3 fw-medium">Efficiency rating</th>
+              <th scope="col" class="py-3 px-3 fw-medium">Matching score</th>
+              <th scope="col" class="py-3 px-3 fw-medium">Image</th>
+              <th scope="col" class="py-3 px-3 fw-medium"></th>
+            </tr>
+          </thead>
+          <tbody class="table-border-style-hidden">
+            {% if appliances %}
+              {% for appliance in appliances %}
+                <tr>
+                  <td class="py-2 px-3 text-muted">{{ appliance.appliance_type|format_snake_case }}</td>
+                  <td class="py-2 px-3 text-muted">{{ appliance.brand }}</td>
+                  <td class="py-2 px-3 text-muted">{{ appliance.model }}</td>
+                  <td class="py-2 px-3 text-muted">${{ appliance.cost }}</td>
+                  <td class="py-2 px-3 text-muted">{{ appliance.efficiency_rating|format_snake_case }}</td>
+                  <td class="py-2 px-3 text-muted">{{ appliance.matching_score|multiply:100|floatformat:0 }}%</td>
+                  <td class="py-2 px-3">
+                    <img src="{{ appliance.image.url }}"
+                         alt="{{ appliance.brand }} {{ appliance.model }}"
+                         height="50"
+                         width="">
+                  </td>
+                  <td class="py-2 px-3">
+                    <button class="btn btn-primary px-3 py-1"
+                            hx-post="{% url 'appliance_replacement_modal' property.id current_appliance.appliance.id %}"
+                            hx-target="#scheduleModal"
+                            hx-swap="outerHTML"
+                            hx-vals='{"appliance_id": "{{ appliance.id }}"}'>Order</button>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td class="py-3 px-3">No appliances found</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

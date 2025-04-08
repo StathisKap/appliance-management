@@ -1,0 +1,28 @@
+{% load appliance_filters %}
+<!-- Appliance info cards -->
+<div class="d-flex flex-wrap mb-4 gap-2 justify-content-center">
+  <div class="border rounded p-3">
+    <div class="small text-muted">Appliance</div>
+    <div class="fw-medium">{{ appliance.appliance_type|format_snake_case }}</div>
+  </div>
+  <div class="border rounded p-3">
+    <div class="small text-muted">Brand</div>
+    <div class="fw-medium">{{ appliance.brand }}</div>
+  </div>
+  <div class="border rounded p-3">
+    <div class="small text-muted">Model Number</div>
+    <div class="fw-medium">{{ appliance.model }}</div>
+  </div>
+  <div class="border rounded p-3">
+    <div class="small text-muted">Cost</div>
+    <div class="fw-medium">${{ appliance.cost }}</div>
+  </div>
+  <div class="border rounded p-3">
+    <div class="small text-muted">Efficiency</div>
+    <div class="fw-medium">{{ appliance.efficiency_rating|format_snake_case }}</div>
+  </div>
+  <div class="border rounded p-3">
+    <div class="small text-muted">Matching Score</div>
+    <div class="fw-medium">{{ appliance.matching_score|multiply:100|floatformat:0 }}%</div>
+  </div>
+</div>

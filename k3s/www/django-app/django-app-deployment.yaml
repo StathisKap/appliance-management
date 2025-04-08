@@ -1,0 +1,61 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-app
+  namespace: django-app
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: django-app
+  template:
+    metadata:
+      labels:
+        app: django-app
+    spec:
+      containers:
+        - name: django-app-container
+          image: stathiskap/appliance-management:1.0
+          imagePullPolicy: Always
+          env:
+            - name: DATABASE_URL
+              value: "postgres://postgres:gZRiEt9FuCLgo85@my-postgres-postgresql.postgres.svc.cluster.local:5432/postgres"
+            - name: DEBUG
+              value: "False"
+            - name: ALLOWED_HOSTS
+              value: '["appliance-management.co.uk"]'
+            - name: S3_ENDPOINT_URL
+              value: "https://cdn.appliance-management.co.uk"
+            - name: S3_ACCESS_KEY
+              value: "wO9gEaLKvtI0Nx69EYpN"
+            - name: S3_SECRET_KEY
+              value: "8mmFyFNQIvzF1dXOSgBXAxqj9JOA7JktJEqQBLOv"
+            - name: S3_BUCKET_NAME
+              value: app-manager
+            - name: SUPERUSER_NAME
+              value: "admin"
+            - name: SUPERUSER_PASSWORD
+              value: "test"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-app-service
+  namespace: django-app
+spec:
+  selector:
+    app: django-app
+  ports:
+    - name: api-port
+      protocol: TCP
+      port: 8000
+      targetPort: 8000

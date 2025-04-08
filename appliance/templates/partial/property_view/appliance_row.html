@@ -1,0 +1,32 @@
+{% load appliance_filters %}
+<tr class="border-bottom"
+    id="property-appliance-{{ property_appliance.id }}">
+  <td class="py-3 px-3 text-muted">{{ property_appliance.appliance.appliance_type|format_snake_case }}</td>
+  <td class="py-3 px-3 text-muted">{{ property_appliance.appliance.brand }}</td>
+  <td class="py-3 px-3 text-muted">{{ property_appliance.appliance.model }}</td>
+  <td class="py-3 px-3 text-muted">${{ property_appliance.get_cost }}</td>
+  <td class="py-3 px-3 text-muted">{{ property_appliance.usage|format_snake_case }}</td>
+  <td class="py-3 px-3 text-muted">
+    {% if property_appliance.is_within_warranty %}
+      <span class="text-success">Within Warranty</span>
+    {% else %}
+      <span class="text-danger">Out of Warranty</span>
+    {% endif %}
+  </td>
+  <td class="py-3 px-3">
+    <img src="{{ property_appliance.appliance.image.url }}"
+         alt="{{ property_appliance.appliance }}"
+         height="50"
+         width="">
+  </td>
+  <td class="py-3 px-3">
+    <a href="{% url 'property_appliance_view' user_property.property.id property_appliance.appliance.id %}"
+       class="btn btn-primary px-4">Replace</a>
+  </td>
+  <td class="py-3">
+    <button class="btn btn-danger"
+            hx-post="{% url 'delete_property_appliance' property_appliance.id %}"
+            hx-target="#property-appliance-{{ property_appliance.id }}"
+            hx-swap="delete">Delete</button>
+  </td>
+</tr>

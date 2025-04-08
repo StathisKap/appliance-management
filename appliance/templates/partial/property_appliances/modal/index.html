@@ -1,0 +1,26 @@
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content p-4">
+      <!-- Header section -->
+      <div>
+        <h1 class="fs-2 text-primary mb-2">Schedule Replacement</h1>
+
+        {% if property %}
+          <p class="text-muted mb-4">{{ property.name }} / {{ property.address }}</p>
+        {% else %}
+          <p class="text-muted mb-4">Property not found</p>
+        {% endif %}
+      </div>
+
+      {% if appliance %}
+        {% include "partial/property_appliances/modal/appliance_info.html" %}
+      {% else %}
+        <p class="text-muted mb-4">Appliance not found</p>
+      {% endif %}
+
+      <hr class="my-4 text-muted">
+
+      {% include "partial/property_appliances/modal/schedule_form.html" %}
+    </div>
+  </div>
+</div>

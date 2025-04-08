@@ -1,0 +1,415 @@
+<!-- Fixed calendar template -->
+<div class="calendar border rounded p-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <button class="btn btn-link" type="button" onclick="navigateMonth('prev')">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+    <h5 class="mb-0" id="monthName">{{ month_name }}</h5>
+    <button class="btn btn-link" type="button" onclick="navigateMonth('next')">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+  <div class="calendar-grid">
+    <div class="calendar-header">
+      <div class="calendar-cell text-muted">Sun</div>
+      <div class="calendar-cell text-muted">Mon</div>
+      <div class="calendar-cell text-muted">Tue</div>
+      <div class="calendar-cell text-muted">Wed</div>
+      <div class="calendar-cell text-muted">Thu</div>
+      <div class="calendar-cell text-muted">Fri</div>
+      <div class="calendar-cell text-muted">Sat</div>
+    </div>
+    <div class="calendar-body" id="calendarBody">
+      {% for date in dates %}
+        {% if forloop.counter0|divisibleby:7 %}
+          {% if not forloop.first %}</div>{% endif %}
+        <div class="calendar-row">
+        {% endif %}
+        <div class="calendar-cell {% if not date.is_available %}disabled{% endif %}">
+          {% if date.is_available %}
+            <input type="radio"
+                   name="date"
+                   value="{{ date.date }}"
+                   class="position-absolute opacity-0"
+                   data-hours="{{ date.available_hours|join:',' }}"
+                   data-minutes="{{ date.available_minutes|join:',' }}"
+                   onchange="updateTimeSelects(this)">
+          {% endif %}
+          <span>{{ date.day }}</span>
+        </div>
+        {% if forloop.last %}</div>{% endif %}
+    {% endfor %}
+  </div>
+</div>
+<input type="hidden"
+       id="currentMonth"
+       value="{{ current_month|date:'Y-m' }}">
+<style>
+  .calendar {
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0.5rem;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .calendar-header, .calendar-row {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .calendar-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    min-width: 0;
+    width: 100%;
+    max-width: 2rem;
+    margin: 0 auto;
+    font-size: 0.875rem;
+    position: relative;
+  }
+
+  .calendar-cell input[type="radio"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .calendar-cell:hover:not(.disabled) {
+    background-color: #f8f9fa;
+  }
+
+  .calendar-cell input:checked + span {
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .calendar-cell.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+</style>
+<script>
+  let currentMonth = document.getElementById('currentMonth').value;
+
+
+  function navigateMonth(direction) {
+
+
+
+    // Parse the current month value
+    let [year, month] = currentMonth.split('-');
+    year = parseInt(year, 10);
+    month = parseInt(month, 10);
+
+
+
+    // Check if we have valid values
+    if (isNaN(year) || isNaN(month)) {
+      console.error('Invalid year or month in currentMonth:', currentMonth);
+      // Fallback to current date
+      const today = new Date();
+      year = today.getFullYear();
+      month = today.getMonth() + 1;
+
+    }
+
+    let newYear = year;
+    let newMonth = month;
+
+    if (direction === 'prev') {
+      if (month === 1) {
+        newMonth = 12;
+        newYear = year - 1;
+      } else {
+        newMonth = month - 1;
+      }
+    } else {
+      if (month === 12) {
+        newMonth = 1;
+        newYear = year + 1;
+      } else {
+        newMonth = month + 1;
+      }
+    }
+
+
+
+    // Ensure month is properly formatted with leading zero if needed
+    const formattedMonth = newMonth.toString().padStart(2, '0');
+
+
+    loadMonth(newYear, formattedMonth);
+  }
+
+  function loadMonth(year, month) {
+
+
+    // Validate inputs
+    year = parseInt(year, 10);
+    month = parseInt(month, 10);
+
+    if (isNaN(year) || isNaN(month)) {
+      console.error('Invalid year or month passed to loadMonth:', { year, month });
+      const today = new Date();
+      year = today.getFullYear();
+      month = today.getMonth() + 1;
+
+    }
+
+    // Make sure month is passed as a string with leading zero if needed
+    const formattedMonth = month.toString().padStart(2, '0');
+
+
+    const url = `/get-month-dates/?year=${year}&month=${formattedMonth}`;
+
+
+    fetch(url)
+      .then(response => {
+
+        if (!response.ok) {
+          throw new Error(`Network response error: ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+
+        document.getElementById('monthName').textContent = data.month_name;
+        document.getElementById('currentMonth').value = `${year}-${formattedMonth}`;
+        currentMonth = `${year}-${formattedMonth}`;
+
+
+        const calendarBody = document.getElementById('calendarBody');
+        if (!calendarBody) {
+          console.error('Could not find calendar body element!');
+          return;
+        }
+
+        calendarBody.innerHTML = '';
+
+
+        let currentRow = document.createElement('div');
+        currentRow.className = 'calendar-row';
+
+
+
+        data.dates.forEach((date, index) => {
+          if (index > 0 && index % 7 === 0) {
+            calendarBody.appendChild(currentRow);
+            currentRow = document.createElement('div');
+            currentRow.className = 'calendar-row';
+
+          }
+
+          const cell = document.createElement('div');
+          cell.className = `calendar-cell ${!date.is_available ? 'disabled' : ''}`;
+
+          if (date.is_available) {
+
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'date';
+            radio.value = date.date;
+            radio.className = 'position-absolute opacity-0';
+
+            // Store the available hours and minutes
+            radio.setAttribute('data-hours', JSON.stringify(date.available_hours));
+            radio.setAttribute('data-minutes', JSON.stringify(date.available_minutes));
+
+            radio.onchange = () => {
+
+              updateTimeSelects(radio);
+            };
+            cell.appendChild(radio);
+          }
+
+          const daySpan = document.createElement('span');
+          daySpan.textContent = date.day;
+          cell.appendChild(daySpan);
+
+          // Add click handler to the cell
+          if (date.is_available) {
+            cell.addEventListener('click', function() {
+
+              const radio = this.querySelector('input[type="radio"]');
+              if (radio) {
+                radio.checked = true;
+
+                // Trigger the change event manually
+                const event = new Event('change');
+                radio.dispatchEvent(event);
+              }
+            });
+          }
+
+          currentRow.appendChild(cell);
+        });
+
+        if (currentRow.children.length > 0) {
+          calendarBody.appendChild(currentRow);
+
+        }
+
+        // After loading the month, set up the radio listeners
+
+        setupCalendarRadioListeners();
+      })
+      .catch(error => {
+        console.error('Error fetching month data:', error);
+      });
+  }
+
+  // Helper function to properly set up the radio listeners
+  function setupCalendarRadioListeners() {
+    const radioButtons = document.querySelectorAll('#calendarBody input[type="radio"]');
+
+
+    radioButtons.forEach((radio, index) => {
+
+
+      // Remove any existing listeners to avoid duplicates
+      radio.removeEventListener('change', handleRadioChange);
+
+      // Add the new listener
+      radio.addEventListener('change', handleRadioChange);
+    });
+  }
+
+  // Handler for radio button changes
+  function handleRadioChange(event) {
+
+    if (this.checked) {
+      updateTimeSelects(this);
+    }
+  }
+
+  function updateTimeSelects(radio) {
+
+    // Parse the data attributes correctly
+    let hours, minutes;
+    try {
+      hours = JSON.parse(radio.getAttribute('data-hours'));
+      minutes = JSON.parse(radio.getAttribute('data-minutes'));
+
+    } catch (e) {
+      console.warn('JSON parsing failed, using split method:', e);
+      // Fallback if JSON parsing fails (e.g., if data is comma-separated)
+      hours = radio.getAttribute('data-hours').split(',');
+      minutes = radio.getAttribute('data-minutes').split(',');
+    }
+    updateTimeSelect('hour', hours);
+    updateTimeSelect('minute', minutes);
+    // Update the date options if needed
+    const dateValue = radio.value;
+    const dateOptions = document.querySelectorAll('.date-option input');
+    let matchFound = false;
+    dateOptions.forEach(option => {
+      if (option.value === dateValue) {
+        const dateOptionDiv = option.closest('.date-option');
+        dateOptionDiv.click();
+        matchFound = true;
+      }
+    });
+
+    // If no match found, clear all date option selections
+    if (!matchFound) {
+
+      // Remove all styling and checkmarks from date options
+      document.querySelectorAll('.date-option').forEach(opt => {
+        opt.classList.remove('bg-light');
+        const checkmark = opt.querySelector('.checkmark-container');
+        if (checkmark) {
+          checkmark.remove();
+        }
+        // Uncheck the radio buttons
+        const optionInput = opt.querySelector('input[type="radio"]');
+        if (optionInput) {
+          optionInput.checked = false;
+        }
+      });
+    }
+  }
+
+  function updateTimeSelect(name, values) {
+    const select = document.querySelector(`select[name="${name}"]`);
+    if (!select) {
+      console.warn(`Could not find select element for ${name}`);
+      return;
+    }
+
+    select.innerHTML = '';
+    values.forEach(value => {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = value;
+      select.appendChild(option);
+    });
+  }
+
+  // Initialize event listeners for existing calendar cells
+  document.querySelectorAll('.calendar-cell:not(.disabled)').forEach(cell => {
+    cell.addEventListener('click', function() {
+      const radio = this.querySelector('input[type="radio"]');
+      if (radio) {
+        radio.checked = true;
+        // Trigger the change event manually
+        const event = new Event('change');
+        radio.dispatchEvent(event);
+      }
+    });
+  });
+
+  // Initialize calendar with current values
+
+  try {
+    const [year, month] = currentMonth.split('-').map(Number);
+    if (isNaN(year) || isNaN(month)) {
+      throw new Error('Invalid initial year or month');
+    }
+
+    loadMonth(year, month);
+  } catch (error) {
+    console.error('Error during initialization:', error);
+    // Fallback to current date
+    const today = new Date();
+    loadMonth(today.getFullYear(), today.getMonth() + 1);
+  }
+
+  // Document ready handler to ensure everything is properly initialized
+  document.addEventListener('DOMContentLoaded', function() {
+    setupCalendarRadioListeners();
+    // Make sure calendar toggle works
+    const calendarTrigger = document.querySelector('.calendar-trigger');
+    if (calendarTrigger) {
+      calendarTrigger.addEventListener('click', function() {
+        const calendarContainer = document.getElementById('calendar-container');
+        if (calendarContainer) {
+          calendarContainer.classList.toggle('show');
+        } else {
+          console.warn('Could not find calendar container element');
+        }
+      });
+    }
+  });
+</script>

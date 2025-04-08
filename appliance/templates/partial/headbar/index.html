@@ -1,0 +1,38 @@
+<div class="d-flex w-full">
+  <div class="d-flex flex-grow-1 justify-content-between mb-2 p-2 bg-white rounded align-items-center">
+    <h4 class="text-primary mb-0 user-select-none">
+      Profile
+    </h4>
+    <div class="d-flex align-items-center">
+      {% include "partial/headbar/notifications.html" %}
+      <div class="d-flex gap-2 align-items-center">
+        <a href="{% url 'profile' %}">
+          <img
+            src="{{ user.profile_pic.url }}"
+            alt="Profile"
+            width="40px"
+            height="40px"
+            class="rounded">
+        </a>
+          <div class="d-flex flex-column justify-content-center user-select-none">
+            <h6 class="text-primary mb-0">
+              {% if user.first_name and user.last_name %}
+                {{ user.first_name }} {{ user.last_name }}
+              {% elif user.username %}
+                {{ user.username }}
+              {% else %}
+                User
+              {% endif %}
+            </h6>
+            <span class="small text-muted lh-1">
+              {% if user.title %}
+                {{ user.title }}
+              {% else %}
+                Title
+              {% endif %}
+            </span>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

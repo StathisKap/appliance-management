@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h5 class="text-primary mb-2">
+  {% if property %}
+    {{ property.name }} / {{ property.address }}
+  {% else %}
+    Property
+  {% endif %}
+</h5>
+
+{% include "partial/property_appliances/current_appliance.html" %}
+{% include "partial/property_appliances/recommended_replacements.html" %}
+{% include "partial/property_appliances/modal/index.html" %}
+
+{% endblock content %}

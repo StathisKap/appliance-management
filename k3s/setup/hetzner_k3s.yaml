@@ -1,0 +1,131 @@
+---
+# hetzner_k3s.yml - Playbook to deploy a CX11 server on Hetzner and install K3s
+
+- name: Create Hetzner CX11 server and install K3s
+  hosts: localhost
+  gather_facts: no
+  vars:
+    hetzner_api_token: "{{ hetzner_api_token | default(lookup('env', 'HETZNER_API_TOKEN')) }}"
+    server_name: "k3s-node"
+    server_image: "ubuntu-22.04"
+    server_type: "cx22"  # CX11 instance type
+    server_location: "nbg1"  # Nuremberg location
+    ssh_key_name: "stathis@MacBook-Pro"  # Your SSH key name in Hetzner
+
+  tasks:
+    - name: Verify Hetzner API token is set
+      fail:
+        msg: "HETZNER_API_TOKEN environment variable must be set"
+      when: hetzner_api_token == ""
+
+    - name: Create Hetzner server
+      uri:
+        url: https://api.hetzner.cloud/v1/servers
+        method: POST
+        headers:
+          Authorization: "Bearer {{ hetzner_api_token }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          name: "{{ server_name }}"
+          server_type: "{{ server_type }}"
+          image: "{{ server_image }}"
+          location: "{{ server_location }}"
+          ssh_keys:
+            - "{{ ssh_key_name }}"
+          labels:
+            purpose: "k3s"
+        status_code: 201
+      register: server_response
+
+    - name: Save server details
+      set_fact:
+        server_ip: "{{ server_response.json.server.public_net.ipv4.ip }}"
+        server_id: "{{ server_response.json.server.id }}"
+        cacheable: yes
+
+    - name: Display server IP
+      debug:
+        msg: "Server created with IP: {{ server_ip }}"
+
+    - name: Wait for SSH to become available
+      wait_for:
+        host: "{{ server_ip }}"
+        port: 22
+        delay: 10
+        timeout: 300
+
+    - name: Add new host to inventory
+      add_host:
+        name: "{{ server_ip }}"
+        groups: k3s_servers
+        ansible_user: root
+        ansible_host: "{{ server_ip }}"
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+
+    - name: Wait for server to complete boot process
+      pause:
+        seconds: 20
+
+# Switch to the newly created server for the next set of tasks
+- name: Install K3s on Hetzner server
+  hosts: k3s_servers
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      apt:
+        name:
+          - curl
+          - apt-transport-https
+          - ca-certificates
+        state: present
+
+    - name: Install K3s
+      shell: curl -sfL https://get.k3s.io | sh -
+
+    - name: Wait for K3s to start
+      pause:
+        seconds: 30
+
+    - name: Check K3s status
+      command: systemctl status k3s
+      register: k3s_status
+      changed_when: false
+
+    - name: Display K3s status
+      debug:
+        var: k3s_status.stdout_lines
+
+    - name: Get K3s kubeconfig
+      command: cat /etc/rancher/k3s/k3s.yaml
+      register: kubeconfig
+      changed_when: false
+
+    - name: Save kubeconfig locally
+      delegate_to: localhost
+      become: no  # Explicitly disable become (sudo) for this task
+      copy:
+        content: "{{ kubeconfig.stdout | replace('127.0.0.1', inventory_hostname) }}"
+        dest: "../k3s-kubeconfig.yaml"
+        mode: "0600"
+
+    - name: Display kubeconfig location
+      delegate_to: localhost
+      debug:
+        msg: "Kubeconfig saved to ./k3s-kubeconfig.yaml"
+
+    - name: Get K3s node information
+      shell: kubectl get nodes --kubeconfig /etc/rancher/k3s/k3s.yaml
+      register: nodes
+      changed_when: false
+
+    - name: Display K3s nodes
+      debug:
+        var: nodes.stdout_lines

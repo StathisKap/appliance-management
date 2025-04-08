@@ -1,0 +1,43 @@
+<div class="card rounded-4 shadow-sm">
+  <div class="card-body p-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2 class="mb-4 text-primary">Current Appliances</h2>
+      <button
+        type="button"
+        class="btn btn-success m-3"
+        hx-post="{% url 'add_property_appliance' user_property.property.id %}"
+        hx-target="#applianceAddModal"
+        hx-swap="outerHTML"
+        hx-trigger="click"
+        >
+        Add Appliance</button>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th scope="col" class="py-3 px-3 fw-medium">Type</th>
+            <th scope="col" class="py-3 px-3 fw-medium">Brand</th>
+            <th scope="col" class="py-3 px-3 fw-medium">Model</th>
+            <th scope="col" class="py-3 px-3 fw-medium">Cost</th>
+            <th scope="col" class="py-3 px-3 fw-medium">Usage</th>
+            <th scope="col" class="py-3 px-3 fw-medium">Warranty</th>
+            <th scope="col" class="py-3 px-3 fw-medium">Image</th>
+            <th scope="col" class="py-3 px-3 fw-medium"></th>
+            <th scope="col" class="py-3 px-3 fw-medium"></th>
+          </tr>
+        </thead>
+        <tbody id="appliance-list" class="table-border-style-hidden">
+          {% for property_appliance in user_property.property.property_appliances.all %}
+            {% include "partial/property_view/appliance_row.html" %}
+            {% if not user_property.property.property_appliances.all %}
+              <tr>
+                <td colspan="8" class="py-3 px-3 text-center">No appliances found for this property.</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

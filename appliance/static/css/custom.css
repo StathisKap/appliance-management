@@ -1,0 +1,64 @@
+/* appliance/static/css/custom.css */
+:root {
+  --bs-primary: #00505a;
+  --bs-primary-rgb: 0, 80, 90;
+}
+
+.bg-primary {
+  background-color: var(--bs-primary) !important;
+}
+
+.table-primary {
+  --bs-table-bg: var(--bs-primary) !important;
+  --bs-table-color: #fff !important;
+  background-color: var(--bs-primary) !important;
+  color: #fff !important;
+}
+
+.table-primary th {
+  color: #fff !important;
+  background-color: var(--bs-primary) !important;
+}
+
+/* Add rounded corners to the first row of the table */
+.table-primary tr:first-child th:first-child {
+  border-top-left-radius: var(--bs-border-radius) !important;
+}
+
+.table-primary tr:first-child th:last-child {
+  border-top-right-radius: var(--bs-border-radius) !important;
+}
+
+/* Add rounded corners to the first row of the table */
+.table-primary tr:first-child th:first-child {
+  border-bottom-left-radius: var(--bs-border-radius) !important;
+}
+
+.table-primary tr:last-child th:last-child {
+  border-bottom-right-radius: var(--bs-border-radius) !important;
+}
+
+.table-border-style-hidden {
+  border-style: hidden !important;
+}
+
+.btn-primary {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+}
+
+.text-primary {
+  color: var(--bs-primary) !important;
+}
+
+/* Override container behavior */
+.container-xxl {
+  max-width: 100%;
+}
+
+/* Custom breakpoint for 1600px */
+@media (min-width: 1600px) {
+  .container-xxl {
+    max-width: 1600px;
+  }
+}
