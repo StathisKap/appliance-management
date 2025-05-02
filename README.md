@@ -1,6 +1,9 @@
 # Appliance Management System
 
+
 ### **TL:DR**
+
+**DEPLOYMENTS NO LONGER LIVE. K3S CLUSTER HAS BEEN TAKEN DOWN**
 
 |user| passowrd|
 |-|-|
