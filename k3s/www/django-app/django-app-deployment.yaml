@@ -36,17 +36,17 @@ spec:
             failureThreshold: 100
           env:
             - name: DATABASE_URL
-              value: "postgres://postgres:gZRiEt9FuCLgo85@my-postgres-postgresql.postgres.svc.cluster.local:5432/postgres"
+              value: "postgres://postgres:1Yo8&gsl!5Vdg$yY@postgres-postgresql.postgres.svc.cluster.local:5432/postgres"
             - name: DEBUG
               value: "False"
             - name: ALLOWED_HOSTS
               value: '["appliance-management.co.uk"]'
             - name: S3_ENDPOINT_URL
-              value: "https://cdn.appliance-management.co.uk"
+              value: "https://cdn.stathis-kapnidis.com"
             - name: S3_ACCESS_KEY
-              value: "wO9gEaLKvtI0Nx69EYpN"
+              value: "Dp6oUt9Mr4n5GP3zzJPe"
             - name: S3_SECRET_KEY
-              value: "8mmFyFNQIvzF1dXOSgBXAxqj9JOA7JktJEqQBLOv"
+              value: "3qiirXBrNUyj2ROtr28LvFzkcAJWx6Hh971pHibY"
             - name: S3_BUCKET_NAME
               value: app-manager
             - name: SUPERUSER_NAME
