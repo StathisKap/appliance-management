@@ -2,8 +2,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: django-app
-  namespace: django-app
+  name: appliance-management
+  namespace: appliance-management
 spec:
   replicas: 1
   revisionHistoryLimit: 2
@@ -14,16 +14,16 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: django-app
+      app: appliance-management
   template:
     metadata:
       labels:
-        app: django-app
+        app: appliance-management
       annotations:
         rollout-timestamp: "{{ GITHUB_SHA }}"  # This will be replaced in your GitHub Action
     spec:
       containers:
-        - name: django-app-container
+        - name: appliance-management-container
           image: stathiskap/appliance-management:1.0
           imagePullPolicy: Always
           readinessProbe:
@@ -64,11 +64,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: django-app-service
-  namespace: django-app
+  name: appliance-management-service
+  namespace: appliance-management
 spec:
   selector:
-    app: django-app
+    app: appliance-management
   ports:
     - name: api-port
       protocol: TCP
